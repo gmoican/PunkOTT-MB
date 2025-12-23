@@ -1,10 +1,7 @@
 #pragma once
 
 #include <juce_audio_processors/juce_audio_processors.h>
-#include "dsp/Gate.h"
-#include "dsp/Lifter.h"
-#include "dsp/Compressor.h"
-#include "dsp/Clipper.h"
+#include "punk_dsp/punk_dsp.h"
 
 #if (MSVC)
 #include "ipps.h"
@@ -28,7 +25,7 @@ namespace Parameters
     // Clipper: Applies a soft-clipping function after the dynamics processing
     constexpr auto clipperId = "clipper";
     constexpr auto clipperName = "Clipper";
-    constexpr auto clipperDefault = false;
+    constexpr auto clipperDefault = true;
 
     constexpr auto outId = "out_gain";
     constexpr auto outName = "Output Gain (dB)";
@@ -152,13 +149,13 @@ private:
     // Utilities
     float inGain = 1.0f;
     float outGain = 1.0f;
-    Gate gate;
-    Clipper clipper;
-    bool clipperState = false;
+    punk_dsp::Gate gate;
+    punk_dsp::Waveshaper clipper;
+    bool clipperState = true;
     
     // --- OTT PROCESSORS ---
-    Lifter lifter;
-    Compressor compressor, masterLimiter;
+    punk_dsp::Lifter lifter;
+    punk_dsp::Compressor compressor, masterLimiter;
     
     // =============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PunkOTTProcessor)
