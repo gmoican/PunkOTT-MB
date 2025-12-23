@@ -94,7 +94,7 @@ jobs:
         zip -r ${{ env.PLUGIN_NAME }}-Windows.zip ${{ env.PLUGIN_NAME }}-Windows
         
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         files: |
           ${{ env.PLUGIN_NAME }}-macOS.zip
