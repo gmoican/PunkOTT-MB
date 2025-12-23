@@ -1,0 +1,20 @@
+[submodule "JUCE"]
+	path = JUCE
+	url = https://github.com/juce-framework/JUCE/
+	branch = develop
+[submodule "cmake"]
+	path = cmake
+	url = https://github.com/sudara/cmake-includes.git
+	branch = main
+[submodule "modules/clap-juce-extensions"]
+	path = modules/clap-juce-extensions
+	url = https://github.com/free-audio/clap-juce-extensions.git
+	branch = main
+[submodule "modules/melatonin_inspector"]
+	path = modules/melatonin_inspector
+	url = https://github.com/sudara/melatonin_inspector.git
+	branch = main
+[submodule "modules/punk_dsp"]
+	path = modules/punk_dsp
+	url = https://github.com/gmoican/punk_dsp.git
+	branch = main
