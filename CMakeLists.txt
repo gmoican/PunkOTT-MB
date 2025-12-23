@@ -52,11 +52,10 @@ add_subdirectory(JUCE)
 add_subdirectory(modules/clap-juce-extensions EXCLUDE_FROM_ALL)
 
 # Add any other modules you want modules here, before the juce_add_plugin call
-# juce_add_module(modules/my_module)
+juce_add_module(modules/punk_dsp)
 
 # This adds the melatonin inspector module
 add_subdirectory (modules/melatonin_inspector)
-add_subdirectory (modules/punk_dsp)
 
 # See `docs/CMake API.md` in the JUCE repo for all config options
 juce_add_plugin("${PROJECT_NAME}"
