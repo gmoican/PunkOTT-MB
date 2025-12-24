@@ -1,6 +1,6 @@
 #include "PluginEditor.h"
 
-PluginEditor::PluginEditor (PunkOTTProcessor& p)
+PluginEditor::PluginEditor (PunkOTT_MB_Processor& p)
     : AudioProcessorEditor (&p),
       processorRef (p)
 {
@@ -12,35 +12,45 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
                                                                            .withAlpha(0.25f)
                       );
     header.setEnabled(false);
-    // header.setButtonText ("Header");
     addAndMakeVisible (header);
     
     footer.setColour (juce::TextButton::buttonColourId, UIColors::container.darker(0.5f)
                                                                            .withAlpha(0.25f)
                       );
     footer.setEnabled(false);
-    // footer.setButtonText ("Footer");
     addAndMakeVisible (footer);
     
     sidebarLeft.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
     sidebarLeft.setEnabled(false);
-    // sidebarLeft.setButtonText ("Sidebar L");
     addAndMakeVisible (sidebarLeft);
     
     sidebarRight.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
     sidebarRight.setEnabled(false);
-    // sidebarRight.setButtonText ("Sidebar R");
     addAndMakeVisible (sidebarRight);
     
-    lifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
-    lifterContainer.setEnabled(false);
-    // lifterContainer.setButtonText("Lifter");
-    addAndMakeVisible (lifterContainer);
+    lowLifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    lowLifterContainer.setEnabled(false);
+    addAndMakeVisible (lowLifterContainer);
     
-    compContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
-    compContainer.setEnabled(false);
-    // compContainer.setButtonText("Comp");
-    addAndMakeVisible (compContainer);
+    midLifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    midLifterContainer.setEnabled(false);
+    addAndMakeVisible (midLifterContainer);
+    
+    highLifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    highLifterContainer.setEnabled(false);
+    addAndMakeVisible (highLifterContainer);
+    
+    lowCompContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    lowCompContainer.setEnabled(false);
+    addAndMakeVisible (lowCompContainer);
+    
+    midCompContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    midCompContainer.setEnabled(false);
+    addAndMakeVisible (midCompContainer);
+    
+    highCompContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    highCompContainer.setEnabled(false);
+    addAndMakeVisible (highCompContainer);
     
     // --- UTILITIES PARAMETERS ---
     // Input knob
@@ -75,85 +85,277 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
 
     // --- LIFTER PARAMETERS ---
     // Lifter-range knob
-    lifterRangeSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    lifterRangeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    lifterRangeSlider.setRange(Parameters::lifterThresMin, Parameters::lifterThresMax, 0.1);
-    lifterRangeSlider.setValue(Parameters::lifterThresDefault);
-    lifterRangeSlider.setName("Lift");
-    addAndMakeVisible(lifterRangeSlider);
+    lowLifterRangeSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowLifterRangeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowLifterRangeSlider.setRange(Parameters::lifterThresMin, Parameters::lifterThresMax, 0.1);
+    lowLifterRangeSlider.setValue(Parameters::lifterThresDefault);
+    lowLifterRangeSlider.setName("Lift");
+    addAndMakeVisible(lowLifterRangeSlider);
     
-    lifterRangeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterThresId, lifterRangeSlider);
+    lowLifterRangeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterThresId, lowLifterRangeSlider);
+    
+    midLifterRangeSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midLifterRangeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midLifterRangeSlider.setRange(Parameters::lifterThresMin, Parameters::lifterThresMax, 0.1);
+    midLifterRangeSlider.setValue(Parameters::lifterThresDefault);
+    midLifterRangeSlider.setName("Lift");
+    addAndMakeVisible(midLifterRangeSlider);
+    
+    midLifterRangeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midLifterThresId, midLifterRangeSlider);
+    
+    highLifterRangeSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    highLifterRangeSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    highLifterRangeSlider.setRange(Parameters::lifterThresMin, Parameters::lifterThresMax, 0.1);
+    highLifterRangeSlider.setValue(Parameters::lifterThresDefault);
+    highLifterRangeSlider.setName("Lift");
+    addAndMakeVisible(highLifterRangeSlider);
+    
+    highLifterRangeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::highLifterThresId, highLifterRangeSlider);
 
     // Lifter-attack knob
-    lifterAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    lifterAttackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    lifterAttackSlider.setRange(Parameters::lifterAttackMin, Parameters::lifterAttackMax, 0.1);
-    lifterAttackSlider.setValue(Parameters::lifterAttackDefault);
-    lifterAttackSlider.setName("Att");
-    addAndMakeVisible(lifterAttackSlider);
+    lowLifterAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowLifterAttackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowLifterAttackSlider.setRange(Parameters::lifterAttackMin, Parameters::lifterAttackMax, 0.1);
+    lowLifterAttackSlider.setValue(Parameters::lifterAttackDefault);
+    lowLifterAttackSlider.setName("Att");
+    addAndMakeVisible(lowLifterAttackSlider);
     
-    lifterAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterAttackId, lifterAttackSlider);
+    lowLifterAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterAttackId, lowLifterAttackSlider);
+    
+    midLifterAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midLifterAttackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midLifterAttackSlider.setRange(Parameters::lifterAttackMin, Parameters::lifterAttackMax, 0.1);
+    midLifterAttackSlider.setValue(Parameters::lifterAttackDefault);
+    midLifterAttackSlider.setName("Att");
+    addAndMakeVisible(midLifterAttackSlider);
+    
+    midLifterAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midLifterAttackId, midLifterAttackSlider);
+    
+    highLifterAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    highLifterAttackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    highLifterAttackSlider.setRange(Parameters::lifterAttackMin, Parameters::lifterAttackMax, 0.1);
+    highLifterAttackSlider.setValue(Parameters::lifterAttackDefault);
+    highLifterAttackSlider.setName("Att");
+    addAndMakeVisible(highLifterAttackSlider);
+    
+    highLifterAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::highLifterAttackId, highLifterAttackSlider);
 
     // Lifter-release knob
-    lifterReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    lifterReleaseSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    lifterReleaseSlider.setRange(Parameters::lifterReleaseMin, Parameters::lifterReleaseMax, 0.1);
-    lifterReleaseSlider.setValue(Parameters::lifterReleaseDefault);
-    lifterReleaseSlider.setName("Rel");
-    addAndMakeVisible(lifterReleaseSlider);
+    lowLifterReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowLifterReleaseSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowLifterReleaseSlider.setRange(Parameters::lifterReleaseMin, Parameters::lifterReleaseMax, 0.1);
+    lowLifterReleaseSlider.setValue(Parameters::lifterReleaseDefault);
+    lowLifterReleaseSlider.setName("Rel");
+    addAndMakeVisible(lowLifterReleaseSlider);
     
-    lifterReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterReleaseId, lifterReleaseSlider);
+    lowLifterReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterReleaseId, lowLifterReleaseSlider);
+    
+    midLifterReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midLifterReleaseSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midLifterReleaseSlider.setRange(Parameters::lifterReleaseMin, Parameters::lifterReleaseMax, 0.1);
+    midLifterReleaseSlider.setValue(Parameters::lifterReleaseDefault);
+    midLifterReleaseSlider.setName("Rel");
+    addAndMakeVisible(midLifterReleaseSlider);
+    
+    midLifterReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midLifterReleaseId, midLifterReleaseSlider);
+    
+    highLifterReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    highLifterReleaseSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    highLifterReleaseSlider.setRange(Parameters::lifterReleaseMin, Parameters::lifterReleaseMax, 0.1);
+    highLifterReleaseSlider.setValue(Parameters::lifterReleaseDefault);
+    highLifterReleaseSlider.setName("Rel");
+    addAndMakeVisible(highLifterReleaseSlider);
+    
+    highLifterReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::highLifterReleaseId, highLifterReleaseSlider);
     
     // Mix knob
-    lifterMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    lifterMixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    lifterMixSlider.setRange(Parameters::lifterMixMin, Parameters::lifterMixMax, 0.01);
-    lifterMixSlider.setValue(Parameters::lifterMixDefault);
-    lifterMixSlider.setName("Mix");
-    addAndMakeVisible(lifterMixSlider);
+    lowLifterMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowLifterMixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowLifterMixSlider.setRange(Parameters::lifterMixMin, Parameters::lifterMixMax, 0.01);
+    lowLifterMixSlider.setValue(Parameters::lifterMixDefault);
+    lowLifterMixSlider.setName("Mix");
+    addAndMakeVisible(lowLifterMixSlider);
     
-    lifterMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterMixId, lifterMixSlider);
+    lowLifterMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterMixId, lowLifterMixSlider);
+    
+    midLifterMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midLifterMixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midLifterMixSlider.setRange(Parameters::lifterMixMin, Parameters::lifterMixMax, 0.01);
+    midLifterMixSlider.setValue(Parameters::lifterMixDefault);
+    midLifterMixSlider.setName("Mix");
+    addAndMakeVisible(midLifterMixSlider);
+    
+    midLifterMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midLifterMixId, midLifterMixSlider);
+    
+    highLifterMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    highLifterMixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    highLifterMixSlider.setRange(Parameters::lifterMixMin, Parameters::lifterMixMax, 0.01);
+    highLifterMixSlider.setValue(Parameters::lifterMixDefault);
+    highLifterMixSlider.setName("Mix");
+    addAndMakeVisible(highLifterMixSlider);
+    
+    highLifterMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::highLifterMixId, highLifterMixSlider);
 
     // --- COMPRESSOR PARAMETERS ---
     // Comp-thres knob
-    compThresSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    compThresSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    compThresSlider.setRange(Parameters::compThresMin, Parameters::compThresMax, 0.1);
-    compThresSlider.setValue(Parameters::compThresDefault);
-    compThresSlider.setName("Comp");
-    addAndMakeVisible(compThresSlider);
+    lowCompThresSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowCompThresSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowCompThresSlider.setRange(Parameters::compThresMin, Parameters::compThresMax, 0.1);
+    lowCompThresSlider.setValue(Parameters::compThresDefault);
+    lowCompThresSlider.setName("Comp");
+    addAndMakeVisible(lowCompThresSlider);
     
-    compThresAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompThresId, compThresSlider);
+    lowCompThresAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompThresId, lowCompThresSlider);
+    
+    midCompThresSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midCompThresSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midCompThresSlider.setRange(Parameters::compThresMin, Parameters::compThresMax, 0.1);
+    midCompThresSlider.setValue(Parameters::compThresDefault);
+    midCompThresSlider.setName("Comp");
+    addAndMakeVisible(midCompThresSlider);
+    
+    midCompThresAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midCompThresId, midCompThresSlider);
+    
+    highCompThresSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    highCompThresSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    highCompThresSlider.setRange(Parameters::compThresMin, Parameters::compThresMax, 0.1);
+    highCompThresSlider.setValue(Parameters::compThresDefault);
+    highCompThresSlider.setName("Comp");
+    addAndMakeVisible(highCompThresSlider);
+    
+    highCompThresAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::highCompThresId, highCompThresSlider);
     
     // Comp-attack knob
-    compAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    compAttackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    compAttackSlider.setRange(Parameters::compAttackMin, Parameters::compAttackMax, 0.1);
-    compAttackSlider.setValue(Parameters::compAttackDefault);
-    compAttackSlider.setName("Att");
-    addAndMakeVisible(compAttackSlider);
+    lowCompAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowCompAttackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowCompAttackSlider.setRange(Parameters::compAttackMin, Parameters::compAttackMax, 0.1);
+    lowCompAttackSlider.setValue(Parameters::compAttackDefault);
+    lowCompAttackSlider.setName("Att");
+    addAndMakeVisible(lowCompAttackSlider);
     
-    compAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompAttackId, compAttackSlider);
+    lowCompAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompAttackId, lowCompAttackSlider);
+    
+    midCompAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midCompAttackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midCompAttackSlider.setRange(Parameters::compAttackMin, Parameters::compAttackMax, 0.1);
+    midCompAttackSlider.setValue(Parameters::compAttackDefault);
+    midCompAttackSlider.setName("Att");
+    addAndMakeVisible(midCompAttackSlider);
+    
+    midCompAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midCompAttackId, midCompAttackSlider);
+    
+    highCompAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    highCompAttackSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    highCompAttackSlider.setRange(Parameters::compAttackMin, Parameters::compAttackMax, 0.1);
+    highCompAttackSlider.setValue(Parameters::compAttackDefault);
+    highCompAttackSlider.setName("Att");
+    addAndMakeVisible(highCompAttackSlider);
+    
+    highCompAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::highCompAttackId, highCompAttackSlider);
     
     // Comp-release knob
-    compReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    compReleaseSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    compReleaseSlider.setRange(Parameters::compReleaseMin, Parameters::compReleaseMax, 0.1);
-    compReleaseSlider.setValue(Parameters::compReleaseDefault);
-    compReleaseSlider.setName("Rel");
-    addAndMakeVisible(compReleaseSlider);
+    lowCompReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowCompReleaseSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowCompReleaseSlider.setRange(Parameters::compReleaseMin, Parameters::compReleaseMax, 0.1);
+    lowCompReleaseSlider.setValue(Parameters::compReleaseDefault);
+    lowCompReleaseSlider.setName("Rel");
+    addAndMakeVisible(lowCompReleaseSlider);
     
-    compReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompReleaseId, compReleaseSlider);
+    lowCompReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompReleaseId, lowCompReleaseSlider);
+    
+    midCompReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midCompReleaseSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midCompReleaseSlider.setRange(Parameters::compReleaseMin, Parameters::compReleaseMax, 0.1);
+    midCompReleaseSlider.setValue(Parameters::compReleaseDefault);
+    midCompReleaseSlider.setName("Rel");
+    addAndMakeVisible(midCompReleaseSlider);
+    
+    midCompReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midCompReleaseId, midCompReleaseSlider);
+    
+    highCompReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    highCompReleaseSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    highCompReleaseSlider.setRange(Parameters::compReleaseMin, Parameters::compReleaseMax, 0.1);
+    highCompReleaseSlider.setValue(Parameters::compReleaseDefault);
+    highCompReleaseSlider.setName("Rel");
+    addAndMakeVisible(highCompReleaseSlider);
+    
+    highCompReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::highCompReleaseId, highCompReleaseSlider);
     
     // Mix knob
-    compMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    compMixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    compMixSlider.setRange(Parameters::compMixMin, Parameters::compMixMax, 0.01);
-    compMixSlider.setValue(Parameters::compMixDefault);
-    compMixSlider.setName("Mix");
-    addAndMakeVisible(compMixSlider);
+    lowCompMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowCompMixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowCompMixSlider.setRange(Parameters::compMixMin, Parameters::compMixMax, 0.01);
+    lowCompMixSlider.setValue(Parameters::compMixDefault);
+    lowCompMixSlider.setName("Mix");
+    addAndMakeVisible(lowCompMixSlider);
     
-    compMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompMixId, compMixSlider);
+    lowCompMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompMixId, lowCompMixSlider);
+    
+    midCompMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midCompMixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midCompMixSlider.setRange(Parameters::compMixMin, Parameters::compMixMax, 0.01);
+    midCompMixSlider.setValue(Parameters::compMixDefault);
+    midCompMixSlider.setName("Mix");
+    addAndMakeVisible(midCompMixSlider);
+    
+    midCompMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midCompMixId, midCompMixSlider);
+    
+    highCompMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    highCompMixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    highCompMixSlider.setRange(Parameters::compMixMin, Parameters::compMixMax, 0.01);
+    highCompMixSlider.setValue(Parameters::compMixDefault);
+    highCompMixSlider.setName("Mix");
+    addAndMakeVisible(highCompMixSlider);
+    
+    highCompMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::highCompMixId, highCompMixSlider);
+    
+    // --- CROSSOVER PARAMETERS ---
+    // Level
+    lowLevelSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowLevelSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowLevelSlider.setRange(Parameters::levelMin, Parameters::levelMax, 0.1);
+    lowLevelSlider.setValue(Parameters::levelDefault);
+    lowLevelSlider.setName("Lows");
+    addAndMakeVisible(lowLevelSlider);
+    
+    lowLevelAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLevelId, lowLevelSlider);
+    
+    midLevelSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midLevelSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midLevelSlider.setRange(Parameters::levelMin, Parameters::levelMax, 0.1);
+    midLevelSlider.setValue(Parameters::levelDefault);
+    midLevelSlider.setName("Mids");
+    addAndMakeVisible(midLevelSlider);
+    
+    midLevelAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midLevelId, midLevelSlider);
+    
+    highLevelSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    highLevelSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    highLevelSlider.setRange(Parameters::levelMin, Parameters::levelMax, 0.1);
+    highLevelSlider.setValue(Parameters::levelDefault);
+    highLevelSlider.setName("Highs");
+    addAndMakeVisible(highLevelSlider);
+    
+    highLevelAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::highLevelId, highLevelSlider);
+    
+    // Crossover frequencies
+    lowmidCrossSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    lowmidCrossSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    lowmidCrossSlider.setRange(Parameters::lowmid_CrossMin, Parameters::lowmid_CrossMax, 1.0);
+    lowmidCrossSlider.setValue(Parameters::lowmid_CrossDefault);
+    lowmidCrossSlider.setName("Low X");
+    addAndMakeVisible(lowmidCrossSlider);
+    
+    lowmidCrossAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowmid_CrossId, lowmidCrossSlider);
+    
+    midhighCrossSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    midhighCrossSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    midhighCrossSlider.setRange(Parameters::midhigh_CrossMin, Parameters::midhigh_CrossMax, 1.0);
+    midhighCrossSlider.setValue(Parameters::midhigh_CrossDefault);
+    midhighCrossSlider.setName("High X");
+    addAndMakeVisible(midhighCrossSlider);
+    
+    midhighCrossAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::midhigh_CrossId, midhighCrossSlider);
     
     // --- CLIPPER ---
     // Clipper button
@@ -305,41 +507,124 @@ void PluginEditor::resized()
                                       .reduced(10, 15)
                             );
     
+    // --- CROSSOVER CONTROLS ---
+    auto crossoverArea = area.removeFromBottom( 60 );
+    crossoverContainer.setBounds(crossoverArea);
+    
+    auto crossSliderArea = crossoverArea.getWidth() / 5;
+    lowLevelSlider.setBounds( crossoverArea.removeFromLeft(crossSliderArea).reduced( 5 ) );
+    lowmidCrossSlider.setBounds( crossoverArea.removeFromLeft(crossSliderArea).reduced( 5 ) );
+    midLevelSlider.setBounds( crossoverArea.removeFromLeft(crossSliderArea).reduced( 5 ) );
+    midhighCrossSlider.setBounds( crossoverArea.removeFromLeft(crossSliderArea).reduced( 5 ) );
+    highLevelSlider.setBounds( crossoverArea.reduced( 5 ) );
+    
     // --- LIFTER AND COMP CONTROLS ---
-    auto contentItemHeight = area.getHeight();
-    // Reserve the top area for lifter and comp containers
-    auto topArea = area.removeFromTop(contentItemHeight);
+    int gridWidth = area.getWidth();
+    int gridHeight = area.getHeight();
+    int colWidth = gridWidth / 3;
+    int rowHeight = gridHeight / 2;
     
-    // Split the top area in half horizontally
-    auto lifterArea = topArea.removeFromLeft(topArea.getWidth() / 2).reduced(10);
-    auto compArea = topArea.reduced(10);
+    lowLifterContainer.setBounds(area.withX( 0 )    // col * colWidth
+                                     .withY( 0 )    // row * rowHeigh
+                                     .withWidth( colWidth )
+                                     .withHeight( rowHeight )
+                                     .reduced( 5 )
+                                 );
+    midLifterContainer.setBounds(area.withX( colWidth )
+                                     .withY( 0 )
+                                     .withWidth( colWidth )
+                                     .withHeight( rowHeight )
+                                     .reduced( 5 )
+                                 );
+    highLifterContainer.setBounds(area.withX( 2 * colWidth )
+                                      .withY( 0 )
+                                      .withWidth( colWidth )
+                                      .withHeight( rowHeight )
+                                      .reduced( 5 )
+                                  );
     
-    lifterContainer.setBounds (lifterArea);
-    compContainer.setBounds (compArea);
+    lowCompContainer.setBounds(area.withX( 0 )
+                                   .withY( rowHeight )
+                                   .withWidth( colWidth )
+                                   .withHeight( rowHeight )
+                                   .reduced( 5 )
+                               );
+    midCompContainer.setBounds(area.withX( colWidth )
+                                   .withY( rowHeight )
+                                   .withWidth( colWidth )
+                                   .withHeight( rowHeight )
+                                   .reduced( 5 )
+                               );
+    highCompContainer.setBounds(area.withX( 2 * colWidth )
+                                    .withY( rowHeight )
+                                    .withWidth( colWidth )
+                                    .withHeight( rowHeight )
+                                    .reduced( 5 )
+                                );
+    
     
     // Position sliders inside lifter container
-    auto lifterSliderArea = lifterArea.reduced(10);
-    auto compSliderArea = compArea.reduced(10);
+    auto lowLifterSliderArea = lowLifterContainer.getLocalBounds().reduced( 5 );
+    auto midLifterSliderArea = midLifterContainer.getLocalBounds().reduced( 5 );
+    auto highLifterSliderArea = highLifterContainer.getLocalBounds().reduced( 5 );
+    auto lowCompSliderArea = lowCompContainer.getLocalBounds().reduced( 5 );
+    auto midCompSliderArea = midCompContainer.getLocalBounds().reduced( 5 );
+    auto highCompSliderArea = highCompContainer.getLocalBounds().reduced( 5 );
     
     // Split into top and bottom rows
-    auto topRow = lifterSliderArea.removeFromTop(lifterSliderArea.getHeight() / 2);
-    auto bottomRow = lifterSliderArea;
+    auto topRow = lowLifterSliderArea.removeFromTop(lowLifterSliderArea.getHeight() / 2);
+    auto bottomRow = lowLifterSliderArea;
 
     // Split each row into left and right columns
     auto sliderWidth = topRow.getWidth() / 2;
     
-    lifterRangeSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
-    lifterMixSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
-    lifterAttackSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
-    lifterReleaseSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    lowLifterRangeSlider.setBounds( topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    lowLifterMixSlider.setBounds( topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    lowLifterAttackSlider.setBounds( bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    lowLifterReleaseSlider.setBounds( bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
     
-    // Position sliders inside comp container
-    // Split into top and bottom rows
-    topRow = compSliderArea.removeFromTop(compSliderArea.getHeight() / 2);
-    bottomRow = compSliderArea;
+    // Iterate process to allocate other controllers
+    topRow = midLifterSliderArea.removeFromTop(midLifterSliderArea.getHeight() / 2);
+    bottomRow = midLifterSliderArea;
     
-    compThresSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
-    compMixSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
-    compAttackSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
-    compReleaseSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    midLifterRangeSlider.setBounds( topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    midLifterMixSlider.setBounds( topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    midLifterAttackSlider.setBounds( bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    midLifterReleaseSlider.setBounds( bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    
+    // Iterate process to allocate other controllers
+    topRow = highLifterSliderArea.removeFromTop(highLifterSliderArea.getHeight() / 2);
+    bottomRow = highLifterSliderArea;
+    
+    highLifterRangeSlider.setBounds( topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    highLifterMixSlider.setBounds( topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    highLifterAttackSlider.setBounds( bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    highLifterReleaseSlider.setBounds( bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    
+    // Iterate process to allocate other controllers
+    topRow = lowCompSliderArea.removeFromTop(lowCompSliderArea.getHeight() / 2);
+    bottomRow = lowCompSliderArea;
+    
+    lowCompThresSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    lowCompMixSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    lowCompAttackSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    lowCompReleaseSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    
+    // Iterate process to allocate other controllers
+    topRow = midCompSliderArea.removeFromTop(midCompSliderArea.getHeight() / 2);
+    bottomRow = midCompSliderArea;
+    
+    midCompThresSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    midCompMixSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    midCompAttackSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    midCompReleaseSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    
+    // Iterate process to allocate other controllers
+    topRow = highCompSliderArea.removeFromTop(highCompSliderArea.getHeight() / 2);
+    bottomRow = highCompSliderArea;
+    
+    highCompThresSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    highCompMixSlider.setBounds(topRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    highCompAttackSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
+    highCompReleaseSlider.setBounds(bottomRow.removeFromLeft(sliderWidth).reduced( (int) sliderWidth * 0.05) );
 }

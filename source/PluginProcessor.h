@@ -158,11 +158,11 @@ struct LevelMeters
     std::atomic<float> rmsOutputRight { -100.0f };
 };
 
-class PunkOTTProcessor : public juce::AudioProcessor
+class PunkOTT_MB_Processor : public juce::AudioProcessor
 {
 public:
-    PunkOTTProcessor();
-    ~PunkOTTProcessor() override;
+    PunkOTT_MB_Processor();
+    ~PunkOTT_MB_Processor() override;
 
     // DEFAULT STUFF ===============================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -232,5 +232,5 @@ private:
     float midHighCrossover = Parameters::midhigh_CrossDefault;  // Hz
     
     // =============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PunkOTTProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PunkOTT_MB_Processor)
 };

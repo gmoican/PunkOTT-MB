@@ -2,7 +2,7 @@
 #include "PluginEditor.h"
 
 //==============================================================================
-PunkOTTProcessor::PunkOTTProcessor()
+PunkOTT_MB_Processor::PunkOTT_MB_Processor()
 : AudioProcessor (BusesProperties()
 #if ! JucePlugin_IsMidiEffect
 #if ! JucePlugin_IsSynth
@@ -14,17 +14,17 @@ PunkOTTProcessor::PunkOTTProcessor()
 {
 }
 
-PunkOTTProcessor::~PunkOTTProcessor()
+PunkOTT_MB_Processor::~PunkOTT_MB_Processor()
 {
 }
 
 //==============================================================================
-const juce::String PunkOTTProcessor::getName() const
+const juce::String PunkOTT_MB_Processor::getName() const
 {
     return JucePlugin_Name;
 }
 
-bool PunkOTTProcessor::acceptsMidi() const
+bool PunkOTT_MB_Processor::acceptsMidi() const
 {
 #if JucePlugin_WantsMidiInput
     return true;
@@ -33,7 +33,7 @@ bool PunkOTTProcessor::acceptsMidi() const
 #endif
 }
 
-bool PunkOTTProcessor::producesMidi() const
+bool PunkOTT_MB_Processor::producesMidi() const
 {
 #if JucePlugin_ProducesMidiOutput
     return true;
@@ -42,7 +42,7 @@ bool PunkOTTProcessor::producesMidi() const
 #endif
 }
 
-bool PunkOTTProcessor::isMidiEffect() const
+bool PunkOTT_MB_Processor::isMidiEffect() const
 {
 #if JucePlugin_IsMidiEffect
     return true;
@@ -51,40 +51,40 @@ bool PunkOTTProcessor::isMidiEffect() const
 #endif
 }
 
-double PunkOTTProcessor::getTailLengthSeconds() const
+double PunkOTT_MB_Processor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int PunkOTTProcessor::getNumPrograms()
+int PunkOTT_MB_Processor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
     // so this should be at least 1, even if you're not really implementing programs.
 }
 
-int PunkOTTProcessor::getCurrentProgram()
+int PunkOTT_MB_Processor::getCurrentProgram()
 {
     return 0;
 }
 
-void PunkOTTProcessor::setCurrentProgram (int index)
+void PunkOTT_MB_Processor::setCurrentProgram (int index)
 {
     juce::ignoreUnused (index);
 }
 
-const juce::String PunkOTTProcessor::getProgramName (int index)
+const juce::String PunkOTT_MB_Processor::getProgramName (int index)
 {
     juce::ignoreUnused (index);
     return {};
 }
 
-void PunkOTTProcessor::changeProgramName (int index, const juce::String& newName)
+void PunkOTT_MB_Processor::changeProgramName (int index, const juce::String& newName)
 {
     juce::ignoreUnused (index, newName);
 }
 
 // =========== PARAMETER LAYOUT ====================
-juce::AudioProcessorValueTreeState::ParameterLayout PunkOTTProcessor::createParams()
+juce::AudioProcessorValueTreeState::ParameterLayout PunkOTT_MB_Processor::createParams()
 {
     juce::AudioProcessorValueTreeState::ParameterLayout layout;
     
@@ -432,7 +432,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout PunkOTTProcessor::createPara
 }
 
 //==============================================================================
-void PunkOTTProcessor::updateParameters()
+void PunkOTT_MB_Processor::updateParameters()
 {
     // --- 1. Utilities
     // const float inLeveldB = apvts.getRawParameterValue(Parameters::inId)->load();
@@ -494,7 +494,7 @@ void PunkOTTProcessor::updateParameters()
     highComp.updateRelease( apvts.getRawParameterValue(Parameters::highCompReleaseId)->load() );
 }
 
-void PunkOTTProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void PunkOTT_MB_Processor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // juce::ignoreUnused(sampleRate);
     juce::dsp::ProcessSpec spec;
@@ -552,13 +552,13 @@ void PunkOTTProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     updateParameters();
 }
 
-void PunkOTTProcessor::releaseResources()
+void PunkOTT_MB_Processor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
 }
 
-bool PunkOTTProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool PunkOTT_MB_Processor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
 #if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
@@ -580,7 +580,7 @@ bool PunkOTTProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 #endif
 }
 
-void PunkOTTProcessor::processBlock (juce::AudioBuffer<float>& buffer,
+void PunkOTT_MB_Processor::processBlock (juce::AudioBuffer<float>& buffer,
                                      juce::MidiBuffer& midiMessages)
 {
     juce::ignoreUnused (midiMessages);
@@ -679,19 +679,19 @@ void PunkOTTProcessor::processBlock (juce::AudioBuffer<float>& buffer,
 }
 
 //==============================================================================
-bool PunkOTTProcessor::hasEditor() const
+bool PunkOTT_MB_Processor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
 }
 
-juce::AudioProcessorEditor* PunkOTTProcessor::createEditor()
+juce::AudioProcessorEditor* PunkOTT_MB_Processor::createEditor()
 {
-    // return new PluginEditor (*this);
-    return new juce::GenericAudioProcessorEditor (*this);
+    return new PluginEditor (*this);
+    // return new juce::GenericAudioProcessorEditor (*this);
 }
 
 //==============================================================================
-void PunkOTTProcessor::getStateInformation (juce::MemoryBlock& destData)
+void PunkOTT_MB_Processor::getStateInformation (juce::MemoryBlock& destData)
 {
     // You should use this method to store your parameters in the memory block.
     // You could do that either as raw data, or use the XML or ValueTree classes
@@ -699,7 +699,7 @@ void PunkOTTProcessor::getStateInformation (juce::MemoryBlock& destData)
     juce::ignoreUnused (destData);
 }
 
-void PunkOTTProcessor::setStateInformation (const void* data, int sizeInBytes)
+void PunkOTT_MB_Processor::setStateInformation (const void* data, int sizeInBytes)
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
@@ -710,5 +710,5 @@ void PunkOTTProcessor::setStateInformation (const void* data, int sizeInBytes)
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new PunkOTTProcessor();
+    return new PunkOTT_MB_Processor();
 }
