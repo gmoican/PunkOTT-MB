@@ -136,17 +136,17 @@ namespace Parameters
     constexpr auto levelMax = 12.0f;
 
     // Crossover frequencies
-    constexpr auto lowCrossId = "low_cross";
-    constexpr auto lowCrossName = "Low Crossover (Hz)";
-    constexpr auto lowCrossDefault = 350.0f;
-    constexpr auto lowCrossMin = 80.0f;
-    constexpr auto lowCrossMax = 600.0f;
+    constexpr auto lowmid_CrossId = "low_cross";
+    constexpr auto lowmid_CrossName = "Low Crossover (Hz)";
+    constexpr auto lowmid_CrossDefault = 350.0f;
+    constexpr auto lowmid_CrossMin = 80.0f;
+    constexpr auto lowmid_CrossMax = 600.0f;
     
-    constexpr auto highCrossId = "high_cross";
-    constexpr auto highCrossName = "High Crossover (Hz)";
-    constexpr auto highCrossDefault = 1000.0f;
-    constexpr auto highCrossMin = 750.0f;
-    constexpr auto highCrossMax = 10000.0f;
+    constexpr auto midhigh_CrossId = "high_cross";
+    constexpr auto midhigh_CrossName = "High Crossover (Hz)";
+    constexpr auto midhigh_CrossDefault = 1000.0f;
+    constexpr auto midhigh_CrossMin = 750.0f;
+    constexpr auto midhigh_CrossMax = 10000.0f;
 }
 
 // GUI Level Meters
@@ -220,7 +220,16 @@ private:
     float midLevel = 1.0f;
     float highLevel = 1.0f;
     
-    juce::dsp::LinkwitzRileyFilter<float> lowBand, highBand;
+    using Filter = juce::dsp::LinkwitzRileyFilter<float>;
+        
+    Filter lowPassFilter1, lowPassFilter2;      // For low band
+    Filter highPassFilter1, highPassFilter2;    // For high band
+    Filter allPassFilter;                       // For phase compensation
+    
+    juce::AudioBuffer<float> lowBand, midBand, highBand;
+    
+    float lowMidCrossover = Parameters::lowmid_CrossDefault;    // Hz
+    float midHighCrossover = Parameters::midhigh_CrossDefault;  // Hz
     
     // =============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PunkOTTProcessor)

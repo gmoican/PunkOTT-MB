@@ -167,19 +167,19 @@ juce::AudioProcessorValueTreeState::ParameterLayout PunkOTTProcessor::createPara
     
     // Low Crossover (Hz)
     crossovers->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                     Parameters::lowCrossId,
-                                                                     Parameters::lowCrossName,
-                                                                     juce::NormalisableRange<float>(Parameters::lowCrossMin, Parameters::lowCrossMax, 1.f, 1.5f),
-                                                                     Parameters::lowCrossDefault
+                                                                     Parameters::lowmid_CrossId,
+                                                                     Parameters::lowmid_CrossName,
+                                                                     juce::NormalisableRange<float>(Parameters::lowmid_CrossMin, Parameters::lowmid_CrossMax, 1.f, 1.5f),
+                                                                     Parameters::lowmid_CrossDefault
                                                                      )
                          );
     
     // High Crossover (Hz)
     crossovers->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                     Parameters::highCrossId,
-                                                                     Parameters::highCrossName,
-                                                                     juce::NormalisableRange<float>(Parameters::highCrossMin, Parameters::highCrossMax, 1.f, 0.8f),
-                                                                     Parameters::highCrossDefault
+                                                                     Parameters::midhigh_CrossId,
+                                                                     Parameters::midhigh_CrossName,
+                                                                     juce::NormalisableRange<float>(Parameters::midhigh_CrossMin, Parameters::midhigh_CrossMax, 1.f, 0.8f),
+                                                                     Parameters::midhigh_CrossDefault
                                                                      )
                          );
     
@@ -446,6 +446,17 @@ void PunkOTTProcessor::updateParameters()
     // const float outdB = apvts.getRawParameterValue(Parameters::outId)->load();
     outGain = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::outId)->load() );
     
+    // --- 2.0. OTT - CROSSOVER FILTERS
+    lowLevel = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::lowLevelId)->load() );
+    midLevel = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::midLevelId)->load() );
+    highLevel = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::highLevelId)->load() );
+    
+    lowPassFilter1.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
+    lowPassFilter2.setCutoffFrequency( apvts.getRawParameterValue(Parameters::midhigh_CrossId)->load() );
+    highPassFilter1.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
+    highPassFilter2.setCutoffFrequency( apvts.getRawParameterValue(Parameters::midhigh_CrossId)->load() );
+    allPassFilter.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
+    
     // --- 2.1. OTT - LOW BAND
     // Lifter updates
     lowLifter.updateMix( apvts.getRawParameterValue(Parameters::lowLifterMixId)->load() );
@@ -517,6 +528,25 @@ void PunkOTTProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     highComp.prepare(spec);
     highComp.updateRatio(8.f);
     
+    // Prepare all filters
+    lowPassFilter1.prepare(spec);
+    lowPassFilter2.prepare(spec);
+    highPassFilter1.prepare(spec);
+    highPassFilter2.prepare(spec);
+    allPassFilter.prepare(spec);
+    
+    // Set filter types and frequencies
+    lowPassFilter1.setType(juce::dsp::LinkwitzRileyFilterType::lowpass);
+    lowPassFilter2.setType(juce::dsp::LinkwitzRileyFilterType::lowpass);
+    highPassFilter1.setType(juce::dsp::LinkwitzRileyFilterType::highpass);
+    highPassFilter2.setType(juce::dsp::LinkwitzRileyFilterType::highpass);
+    allPassFilter.setType(juce::dsp::LinkwitzRileyFilterType::allpass);
+    
+    // Allocate band buffers
+    lowBand.setSize(spec.numChannels, samplesPerBlock);
+    midBand.setSize(spec.numChannels, samplesPerBlock);
+    highBand.setSize(spec.numChannels, samplesPerBlock);
+    
     clipper.setGainFactor(1.7f);
     
     updateParameters();
@@ -558,46 +588,94 @@ void PunkOTTProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-    
+    const int numSamples = buffer.getNumSamples();
+    const int numChannels = buffer.getNumChannels();
     // Clear any unused output channel
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+        buffer.clear (i, 0, numSamples);
     
     // Update params
     updateParameters();
     
     //GUI - Input level meters
     if (totalNumInputChannels > 0)
-        levelMeters.rmsInputLeft.store(juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples())));
+        levelMeters.rmsInputLeft.store(juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, numSamples)));
     if (totalNumInputChannels > 1)
-        levelMeters.rmsInputRight.store(juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples())));
+        levelMeters.rmsInputRight.store(juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, numSamples)));
     
     // 1. UTILITIES - INPUT GAIN & GATE
     buffer.applyGain(inGain);
     gate.process(buffer);
     
-    // 2. OTT - Lifter
-    lowLifter.process(buffer);
+    // 2. OTT - BAND SPLITTING
+    // Copy input to band buffers
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        lowBand.copyFrom(ch, 0, buffer, ch, 0, numSamples);
+        midBand.copyFrom(ch, 0, buffer, ch, 0, numSamples);
+        highBand.copyFrom(ch, 0, buffer, ch, 0, numSamples);
+    }
     
-    // 2. OTT - Comp
-    lowComp.process(buffer);
+    // Create audio blocks for DSP processing
+    juce::dsp::AudioBlock<float> lowBlock(lowBand);
+    juce::dsp::AudioBlock<float> midBlock(midBand);
+    juce::dsp::AudioBlock<float> highBlock(highBand);
     
-    // 2. OTT - Safe limiter
+    juce::dsp::ProcessContextReplacing<float> lowContext(lowBlock);
+    juce::dsp::ProcessContextReplacing<float> midContext(midBlock);
+    juce::dsp::ProcessContextReplacing<float> highContext(highBlock);
+    
+    // Process LOW band: LP @ lowMidCrossover
+    lowPassFilter1.process(lowContext);
+    
+    // Process HIGH band: HP @ midHighCrossover
+    highPassFilter2.process(highContext);
+    
+    // Process MID band: HP @ lowMidCrossover, then LP @ midHighCrossover
+    highPassFilter1.process(midContext);
+    lowPassFilter2.process(midContext);
+    
+    // Phase compensation for low band (optional but recommended)
+    allPassFilter.process(lowContext);
+    
+    // 3. OTT - MULTIBAND PROCESSING
+    lowLifter.process(lowBand);
+    lowComp.process(lowBand);
+    lowBand.applyGain(lowLevel);
+    
+    midLifter.process(midBand);
+    midComp.process(midBand);
+    midBand.applyGain(midLevel);
+    
+    highLifter.process(highBand);
+    highComp.process(highBand);
+    highBand.applyGain(highLevel);
+    
+    // 4. MIX BANDS BACK TOGETHER
+    buffer.clear();
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        buffer.addFrom(ch, 0, lowBand, ch, 0, numSamples);
+        buffer.addFrom(ch, 0, midBand, ch, 0, numSamples);
+        buffer.addFrom(ch, 0, highBand, ch, 0, numSamples);
+    }
+    
+    // 5. OTT - SAFE LIMITER
     masterLimiter.process(buffer);
     
-    // 3. UTILITIES - Clipper
+    // 6. UTILITIES - Clipper
     if (clipperState) {
         clipper.applyTanhClipper(buffer);
     }
     
-    // 3. UTILITIES - OUTPUT GAIN
+    // 7. UTILITIES - OUTPUT GAIN
     buffer.applyGain(outGain);
     
     // GUI - Output level meters
     if (totalNumOutputChannels > 0)
-        levelMeters.rmsOutputLeft.store(juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, buffer.getNumSamples())));
+        levelMeters.rmsOutputLeft.store(juce::Decibels::gainToDecibels(buffer.getRMSLevel(0, 0, numSamples)));
     if (totalNumOutputChannels > 1)
-        levelMeters.rmsOutputRight.store(juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, buffer.getNumSamples())));
+        levelMeters.rmsOutputRight.store(juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, numSamples)));
 }
 
 //==============================================================================

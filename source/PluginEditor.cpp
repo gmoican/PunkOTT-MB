@@ -82,7 +82,7 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
     lifterRangeSlider.setName("Lift");
     addAndMakeVisible(lifterRangeSlider);
     
-    lifterRangeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lifterThresId, lifterRangeSlider);
+    lifterRangeAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterThresId, lifterRangeSlider);
 
     // Lifter-attack knob
     lifterAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -92,7 +92,7 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
     lifterAttackSlider.setName("Att");
     addAndMakeVisible(lifterAttackSlider);
     
-    lifterAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lifterAttackId, lifterAttackSlider);
+    lifterAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterAttackId, lifterAttackSlider);
 
     // Lifter-release knob
     lifterReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -102,7 +102,7 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
     lifterReleaseSlider.setName("Rel");
     addAndMakeVisible(lifterReleaseSlider);
     
-    lifterReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lifterReleaseId, lifterReleaseSlider);
+    lifterReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterReleaseId, lifterReleaseSlider);
     
     // Mix knob
     lifterMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -112,7 +112,7 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
     lifterMixSlider.setName("Mix");
     addAndMakeVisible(lifterMixSlider);
     
-    lifterMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lifterMixId, lifterMixSlider);
+    lifterMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowLifterMixId, lifterMixSlider);
 
     // --- COMPRESSOR PARAMETERS ---
     // Comp-thres knob
@@ -123,7 +123,7 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
     compThresSlider.setName("Comp");
     addAndMakeVisible(compThresSlider);
     
-    compThresAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::compThresId, compThresSlider);
+    compThresAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompThresId, compThresSlider);
     
     // Comp-attack knob
     compAttackSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -133,7 +133,7 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
     compAttackSlider.setName("Att");
     addAndMakeVisible(compAttackSlider);
     
-    compAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::compAttackId, compAttackSlider);
+    compAttackAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompAttackId, compAttackSlider);
     
     // Comp-release knob
     compReleaseSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -143,7 +143,7 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
     compReleaseSlider.setName("Rel");
     addAndMakeVisible(compReleaseSlider);
     
-    compReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::compReleaseId, compReleaseSlider);
+    compReleaseAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompReleaseId, compReleaseSlider);
     
     // Mix knob
     compMixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
@@ -153,7 +153,7 @@ PluginEditor::PluginEditor (PunkOTTProcessor& p)
     compMixSlider.setName("Mix");
     addAndMakeVisible(compMixSlider);
     
-    compMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::compMixId, compMixSlider);
+    compMixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::lowCompMixId, compMixSlider);
     
     // --- CLIPPER ---
     // Clipper button
