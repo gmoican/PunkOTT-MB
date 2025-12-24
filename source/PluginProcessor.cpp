@@ -131,89 +131,302 @@ juce::AudioProcessorValueTreeState::ParameterLayout PunkOTTProcessor::createPara
     
     layout.add(std::move(utilsGroup));
     
-    // --- OTT Parameters Group ---
+    // --- OTT Parameters Group --- CROSSOVERS ---
+    auto crossovers = std::make_unique<juce::AudioProcessorParameterGroup>(
+                                                                           "crossovers",   // Group ID (must be unique string)
+                                                                           "Crossovers",   // Group Name (displayed in host)
+                                                                           " | "           // Separator string for hosts that flatten the hierarchy
+                                                                           );
     
-    auto dynGroup = std::make_unique<juce::AudioProcessorParameterGroup>(
-                                                                         "dyn",         // Group ID (must be unique string)
-                                                                         "Dynamics",    // Group Name (displayed in host)
-                                                                         " | "          // Separator string for hosts that flatten the hierarchy
+    // Low Level (dB)
+    crossovers->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                     Parameters::lowLevelId,
+                                                                     Parameters::lowLevelName,
+                                                                     juce::NormalisableRange<float>(Parameters::levelMin, Parameters::levelMax, 0.1f),
+                                                                     Parameters::levelDefault
+                                                                     )
+                         );
+    
+    // Mid Level (dB)
+    crossovers->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                     Parameters::midLevelId,
+                                                                     Parameters::midLevelName,
+                                                                     juce::NormalisableRange<float>(Parameters::levelMin, Parameters::levelMax, 0.1f),
+                                                                     Parameters::levelDefault
+                                                                     )
+                         );
+    
+    // High Level (dB)
+    crossovers->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                     Parameters::highLevelId,
+                                                                     Parameters::highLevelName,
+                                                                     juce::NormalisableRange<float>(Parameters::levelMin, Parameters::levelMax, 0.1f),
+                                                                     Parameters::levelDefault
+                                                                     )
+                         );
+    
+    // Low Crossover (Hz)
+    crossovers->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                     Parameters::lowCrossId,
+                                                                     Parameters::lowCrossName,
+                                                                     juce::NormalisableRange<float>(Parameters::lowCrossMin, Parameters::lowCrossMax, 1.f, 1.5f),
+                                                                     Parameters::lowCrossDefault
+                                                                     )
+                         );
+    
+    // High Crossover (Hz)
+    crossovers->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                     Parameters::highCrossId,
+                                                                     Parameters::highCrossName,
+                                                                     juce::NormalisableRange<float>(Parameters::highCrossMin, Parameters::highCrossMax, 1.f, 0.8f),
+                                                                     Parameters::highCrossDefault
+                                                                     )
+                         );
+    
+    layout.add(std::move(crossovers));
+    
+    // --- OTT Parameters Group --- LOW BAND ---
+    auto lowBand = std::make_unique<juce::AudioProcessorParameterGroup>(
+                                                                        "lowBand",     // Group ID (must be unique string)
+                                                                        "Low Band",    // Group Name (displayed in host)
+                                                                        " | "          // Separator string for hosts that flatten the hierarchy
+                                                                        );
+    
+    // Lifter Threshold (dB)
+    lowBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::lowLifterThresId,
+                                                                  Parameters::lowLifterThresName,
+                                                                  juce::NormalisableRange<float>(Parameters::lifterThresMin, Parameters::lifterThresMax, 0.1f),
+                                                                  Parameters::lifterThresDefault
+                                                                  )
+                      );
+    
+    // Lifter Attack Time
+    lowBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::lowLifterAttackId,
+                                                                  Parameters::lowLifterAttackName,
+                                                                  juce::NormalisableRange<float>(Parameters::lifterAttackMin, Parameters::lifterAttackMax, 0.1f),
+                                                                  Parameters::lifterAttackDefault
+                                                                  )
+                      );
+    
+    // Lifter Release Time
+    lowBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::lowLifterReleaseId,
+                                                                  Parameters::lowLifterReleaseName,
+                                                                  juce::NormalisableRange<float>(Parameters::lifterReleaseMin, Parameters::lifterReleaseMax, 0.1f),
+                                                                  Parameters::lifterReleaseDefault
+                                                                  )
+                      );
+    
+    // Lifter Mix (Wet/Dry)
+    lowBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::lowLifterMixId,
+                                                                  Parameters::lowLifterMixName,
+                                                                  juce::NormalisableRange<float>(Parameters::lifterMixMin, Parameters::lifterMixMax, 1.0f),
+                                                                  Parameters::lifterMixDefault
+                                                                  )
+                      );
+    
+    // Compressor Threshold (dB)
+    lowBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::lowCompThresId,
+                                                                  Parameters::lowCompThresName,
+                                                                  juce::NormalisableRange<float>(Parameters::compThresMin, Parameters::compThresMax, 0.1f),
+                                                                  Parameters::compThresDefault
+                                                                  )
+                      );
+    
+    // Compressor Attack Time
+    lowBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::lowCompAttackId,
+                                                                  Parameters::lowCompAttackName,
+                                                                  juce::NormalisableRange<float>(Parameters::compAttackMin, Parameters::compAttackMax, 0.1f),
+                                                                  Parameters::compAttackDefault
+                                                                  )
+                      );
+    
+    // Compressor Release Time
+    lowBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::lowCompReleaseId,
+                                                                  Parameters::lowCompReleaseName,
+                                                                  juce::NormalisableRange<float>(Parameters::compReleaseMin, Parameters::compReleaseMax, 0.1f),
+                                                                  Parameters::compReleaseDefault
+                                                                  )
+                      );
+    
+    // Compressor Mix (Wet/Dry)
+    lowBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::lowCompMixId,
+                                                                  Parameters::lowCompMixName,
+                                                                  juce::NormalisableRange<float>(Parameters::compMixMin, Parameters::compMixMax, 1.0f),
+                                                                  Parameters::compMixDefault
+                                                                  )
+                      );
+    
+    layout.add(std::move(lowBand));
+    
+    // --- OTT Parameters Group --- MID BAND ---
+    auto midBand = std::make_unique<juce::AudioProcessorParameterGroup>(
+                                                                        "midBand",     // Group ID (must be unique string)
+                                                                        "Mid Band",    // Group Name (displayed in host)
+                                                                        " | "          // Separator string for hosts that flatten the hierarchy
+                                                                        );
+    
+    // Lifter Threshold (dB)
+    midBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::midLifterThresId,
+                                                                  Parameters::midLifterThresName,
+                                                                  juce::NormalisableRange<float>(Parameters::lifterThresMin, Parameters::lifterThresMax, 0.1f),
+                                                                  Parameters::lifterThresDefault
+                                                                  )
+                      );
+    
+    // Lifter Attack Time
+    midBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::midLifterAttackId,
+                                                                  Parameters::midLifterAttackName,
+                                                                  juce::NormalisableRange<float>(Parameters::lifterAttackMin, Parameters::lifterAttackMax, 0.1f),
+                                                                  Parameters::lifterAttackDefault
+                                                                  )
+                      );
+    
+    // Lifter Release Time
+    midBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::midLifterReleaseId,
+                                                                  Parameters::midLifterReleaseName,
+                                                                  juce::NormalisableRange<float>(Parameters::lifterReleaseMin, Parameters::lifterReleaseMax, 0.1f),
+                                                                  Parameters::lifterReleaseDefault
+                                                                  )
+                      );
+    
+    // Lifter Mix (Wet/Dry)
+    midBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::midLifterMixId,
+                                                                  Parameters::midLifterMixName,
+                                                                  juce::NormalisableRange<float>(Parameters::lifterMixMin, Parameters::lifterMixMax, 1.0f),
+                                                                  Parameters::lifterMixDefault
+                                                                  )
+                      );
+    
+    // Compressor Threshold (dB)
+    midBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::midCompThresId,
+                                                                  Parameters::midCompThresName,
+                                                                  juce::NormalisableRange<float>(Parameters::compThresMin, Parameters::compThresMax, 0.1f),
+                                                                  Parameters::compThresDefault
+                                                                  )
+                      );
+    
+    // Compressor Attack Time
+    midBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::midCompAttackId,
+                                                                  Parameters::midCompAttackName,
+                                                                  juce::NormalisableRange<float>(Parameters::compAttackMin, Parameters::compAttackMax, 0.1f),
+                                                                  Parameters::compAttackDefault
+                                                                  )
+                      );
+    
+    // Compressor Release Time
+    midBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::midCompReleaseId,
+                                                                  Parameters::midCompReleaseName,
+                                                                  juce::NormalisableRange<float>(Parameters::compReleaseMin, Parameters::compReleaseMax, 0.1f),
+                                                                  Parameters::compReleaseDefault
+                                                                  )
+                      );
+    
+    // Compressor Mix (Wet/Dry)
+    midBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                  Parameters::midCompMixId,
+                                                                  Parameters::midCompMixName,
+                                                                  juce::NormalisableRange<float>(Parameters::compMixMin, Parameters::compMixMax, 1.0f),
+                                                                  Parameters::compMixDefault
+                                                                  )
+                      );
+    
+    layout.add(std::move(midBand));
+    
+    // --- OTT Parameters Group --- HIGH BAND ---
+    auto highBand = std::make_unique<juce::AudioProcessorParameterGroup>(
+                                                                         "highBand",     // Group ID (must be unique string)
+                                                                         "High Band",    // Group Name (displayed in host)
+                                                                         " | "           // Separator string for hosts that flatten the hierarchy
                                                                          );
     
     // Lifter Threshold (dB)
-    dynGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                   Parameters::lifterThresId,
-                                                                   Parameters::lifterThresName,
+    highBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                   Parameters::highLifterThresId,
+                                                                   Parameters::highLifterThresName,
                                                                    juce::NormalisableRange<float>(Parameters::lifterThresMin, Parameters::lifterThresMax, 0.1f),
                                                                    Parameters::lifterThresDefault
                                                                    )
-                       
                        );
     
     // Lifter Attack Time
-    dynGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                   Parameters::lifterAttackId,
-                                                                   Parameters::lifterAttackName,
+    highBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                   Parameters::highLifterAttackId,
+                                                                   Parameters::highLifterAttackName,
                                                                    juce::NormalisableRange<float>(Parameters::lifterAttackMin, Parameters::lifterAttackMax, 0.1f),
                                                                    Parameters::lifterAttackDefault
                                                                    )
                        );
     
     // Lifter Release Time
-    dynGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                   Parameters::lifterReleaseId,
-                                                                   Parameters::lifterReleaseName,
+    highBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                   Parameters::highLifterReleaseId,
+                                                                   Parameters::highLifterReleaseName,
                                                                    juce::NormalisableRange<float>(Parameters::lifterReleaseMin, Parameters::lifterReleaseMax, 0.1f),
                                                                    Parameters::lifterReleaseDefault
                                                                    )
                        );
     
     // Lifter Mix (Wet/Dry)
-    dynGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                     Parameters::lifterMixId,
-                                                                     Parameters::lifterMixName,
-                                                                     juce::NormalisableRange<float>(Parameters::lifterMixMin, Parameters::lifterMixMax, 1.0f),
-                                                                     Parameters::lifterMixDefault
-                                                                     )
-                         );
+    highBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                   Parameters::highLifterMixId,
+                                                                   Parameters::highLifterMixName,
+                                                                   juce::NormalisableRange<float>(Parameters::lifterMixMin, Parameters::lifterMixMax, 1.0f),
+                                                                   Parameters::lifterMixDefault
+                                                                   )
+                       );
     
     // Compressor Threshold (dB)
-    dynGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                   Parameters::compThresId,
-                                                                   Parameters::compThresName,
+    highBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                   Parameters::highCompThresId,
+                                                                   Parameters::highCompThresName,
                                                                    juce::NormalisableRange<float>(Parameters::compThresMin, Parameters::compThresMax, 0.1f),
                                                                    Parameters::compThresDefault
                                                                    )
-                       
                        );
     
     // Compressor Attack Time
-    dynGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                   Parameters::compAttackId,
-                                                                   Parameters::compAttackName,
+    highBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                   Parameters::highCompAttackId,
+                                                                   Parameters::highCompAttackName,
                                                                    juce::NormalisableRange<float>(Parameters::compAttackMin, Parameters::compAttackMax, 0.1f),
                                                                    Parameters::compAttackDefault
                                                                    )
                        );
     
     // Compressor Release Time
-    dynGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                   Parameters::compReleaseId,
-                                                                   Parameters::compReleaseName,
+    highBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                   Parameters::highCompReleaseId,
+                                                                   Parameters::highCompReleaseName,
                                                                    juce::NormalisableRange<float>(Parameters::compReleaseMin, Parameters::compReleaseMax, 0.1f),
                                                                    Parameters::compReleaseDefault
                                                                    )
                        );
     
     // Compressor Mix (Wet/Dry)
-    dynGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
-                                                                     Parameters::compMixId,
-                                                                     Parameters::compMixName,
-                                                                     juce::NormalisableRange<float>(Parameters::compMixMin, Parameters::compMixMax, 1.0f),
-                                                                     Parameters::compMixDefault
-                                                                     )
-                         );
+    highBand->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                   Parameters::highCompMixId,
+                                                                   Parameters::highCompMixName,
+                                                                   juce::NormalisableRange<float>(Parameters::compMixMin, Parameters::compMixMax, 1.0f),
+                                                                   Parameters::compMixDefault
+                                                                   )
+                       );
     
-    layout.add(std::move(dynGroup));
+    layout.add(std::move(highBand));
     
     return layout;
 }
@@ -222,44 +435,52 @@ juce::AudioProcessorValueTreeState::ParameterLayout PunkOTTProcessor::createPara
 void PunkOTTProcessor::updateParameters()
 {
     // --- 1. Utilities
-    const float inLeveldB = apvts.getRawParameterValue(Parameters::inId)->load();
-    inGain = juce::Decibels::decibelsToGain(inLeveldB);
+    // const float inLeveldB = apvts.getRawParameterValue(Parameters::inId)->load();
+    inGain = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::inId)->load() );
     
-    const float gatedB = apvts.getRawParameterValue(Parameters::gateId)->load();
-    gate.updateThres(gatedB);
+    // const float gatedB = apvts.getRawParameterValue(Parameters::gateId)->load();
+    gate.updateThres( apvts.getRawParameterValue(Parameters::gateId)->load() );
     
     clipperState = (bool) apvts.getRawParameterValue(Parameters::clipperId)->load();
     
-    const float outdB = apvts.getRawParameterValue(Parameters::outId)->load();
-    outGain = juce::Decibels::decibelsToGain(outdB);
+    // const float outdB = apvts.getRawParameterValue(Parameters::outId)->load();
+    outGain = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::outId)->load() );
     
-    // --- 2. OTT
-    float sampleRate = (float) getSampleRate();
-    
+    // --- 2.1. OTT - LOW BAND
     // Lifter updates
-    const float lifterMix = apvts.getRawParameterValue(Parameters::lifterMixId)->load();
-    const float rangedB = apvts.getRawParameterValue(Parameters::lifterThresId)->load();
-    const float lifterAttackMS = apvts.getRawParameterValue(Parameters::lifterAttackId)->load();
-    const float lifterReleaseMS = apvts.getRawParameterValue(Parameters::lifterReleaseId)->load();
-    float lifterCompensationGain = (rangedB > -40.0f) ? juce::jmap(rangedB, -40.0f, 0.0f, 0.0f, -8.0f) : 0.0f;
-    lifterCompensationGain = juce::Decibels::decibelsToGain(lifterCompensationGain);
-    
-    lifter.updateMix(lifterMix);
-    lifter.updateRange(rangedB);
-    lifter.updateAttack(lifterAttackMS);
-    lifter.updateRelease(lifterReleaseMS);
-    outGain = outGain * (lifterCompensationGain * lifterMix / 100.f + (1.f - lifterMix / 100.f));
-    
+    lowLifter.updateMix( apvts.getRawParameterValue(Parameters::lowLifterMixId)->load() );
+    lowLifter.updateRange( apvts.getRawParameterValue(Parameters::lowLifterThresId)->load() );
+    lowLifter.updateAttack( apvts.getRawParameterValue(Parameters::lowLifterAttackId)->load() );
+    lowLifter.updateRelease( apvts.getRawParameterValue(Parameters::lowLifterReleaseId)->load() );
     // Compressor updates
-    const float compMix = apvts.getRawParameterValue(Parameters::compMixId)->load();
-    const float thresdB = apvts.getRawParameterValue(Parameters::compThresId)->load();
-    const float compAttackMS = apvts.getRawParameterValue(Parameters::compAttackId)->load();
-    const float compReleaseMS = apvts.getRawParameterValue(Parameters::compReleaseId)->load();
+    lowComp.updateMix( apvts.getRawParameterValue(Parameters::lowCompMixId)->load() );
+    lowComp.updateThres( apvts.getRawParameterValue(Parameters::lowCompThresId)->load() );
+    lowComp.updateAttack( apvts.getRawParameterValue(Parameters::lowCompAttackId)->load() );
+    lowComp.updateRelease( apvts.getRawParameterValue(Parameters::lowCompReleaseId)->load() );
     
-    compressor.updateMix(compMix);
-    compressor.updateThres(thresdB);
-    compressor.updateAttack(compAttackMS);
-    compressor.updateRelease(compReleaseMS);
+    // --- 2.2. OTT - MID BAND
+    // Lifter updates
+    midLifter.updateMix( apvts.getRawParameterValue(Parameters::midLifterMixId)->load() );
+    midLifter.updateRange( apvts.getRawParameterValue(Parameters::midLifterThresId)->load() );
+    midLifter.updateAttack( apvts.getRawParameterValue(Parameters::midLifterAttackId)->load() );
+    midLifter.updateRelease( apvts.getRawParameterValue(Parameters::midLifterReleaseId)->load() );
+    // Compressor updates
+    midComp.updateMix( apvts.getRawParameterValue(Parameters::midCompMixId)->load() );
+    midComp.updateThres( apvts.getRawParameterValue(Parameters::midCompThresId)->load() );
+    midComp.updateAttack( apvts.getRawParameterValue(Parameters::midCompAttackId)->load() );
+    midComp.updateRelease( apvts.getRawParameterValue(Parameters::midCompReleaseId)->load() );
+    
+    // --- 2.3. OTT - HIGH BAND
+    // Lifter updates
+    highLifter.updateMix( apvts.getRawParameterValue(Parameters::highLifterMixId)->load() );
+    highLifter.updateRange( apvts.getRawParameterValue(Parameters::highLifterThresId)->load() );
+    highLifter.updateAttack( apvts.getRawParameterValue(Parameters::highLifterAttackId)->load() );
+    highLifter.updateRelease( apvts.getRawParameterValue(Parameters::highLifterReleaseId)->load() );
+    // Compressor updates
+    highComp.updateMix( apvts.getRawParameterValue(Parameters::highCompMixId)->load() );
+    highComp.updateThres( apvts.getRawParameterValue(Parameters::highCompThresId)->load() );
+    highComp.updateAttack( apvts.getRawParameterValue(Parameters::highCompAttackId)->load() );
+    highComp.updateRelease( apvts.getRawParameterValue(Parameters::highCompReleaseId)->load() );
 }
 
 void PunkOTTProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -282,10 +503,19 @@ void PunkOTTProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
     masterLimiter.updateAttack( 30.0f );
     masterLimiter.updateRelease(  100.0f );
     
-    lifter.prepare(spec);
-    lifter.updateRatio(6.f);
-    compressor.prepare(spec);
-    compressor.updateRatio(8.f);
+    lowLifter.prepare(spec);
+    lowLifter.updateRatio(6.f);
+    midLifter.prepare(spec);
+    midLifter.updateRatio(6.f);
+    highLifter.prepare(spec);
+    highLifter.updateRatio(6.f);
+    
+    lowComp.prepare(spec);
+    lowComp.updateRatio(8.f);
+    midComp.prepare(spec);
+    midComp.updateRatio(8.f);
+    highComp.prepare(spec);
+    highComp.updateRatio(8.f);
     
     clipper.setGainFactor(1.7f);
     
@@ -347,10 +577,10 @@ void PunkOTTProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     gate.process(buffer);
     
     // 2. OTT - Lifter
-    lifter.process(buffer);
+    lowLifter.process(buffer);
     
     // 2. OTT - Comp
-    compressor.process(buffer);
+    lowComp.process(buffer);
     
     // 2. OTT - Safe limiter
     masterLimiter.process(buffer);
@@ -378,8 +608,8 @@ bool PunkOTTProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* PunkOTTProcessor::createEditor()
 {
-    return new PluginEditor (*this);
-    // return new juce::GenericAudioProcessorEditor (*this);
+    // return new PluginEditor (*this);
+    return new juce::GenericAudioProcessorEditor (*this);
 }
 
 //==============================================================================
