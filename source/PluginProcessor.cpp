@@ -246,8 +246,8 @@ void PunkOTTProcessor::updateParameters()
     
     lifter.updateMix(lifterMix);
     lifter.updateRange(rangedB);
-    lifter.updateAttack(sampleRate, lifterAttackMS);
-    lifter.updateRelease(sampleRate, lifterReleaseMS);
+    lifter.updateAttack(lifterAttackMS);
+    lifter.updateRelease(lifterReleaseMS);
     outGain = outGain * (lifterCompensationGain * lifterMix / 100.f + (1.f - lifterMix / 100.f));
     
     // Compressor updates
@@ -258,29 +258,33 @@ void PunkOTTProcessor::updateParameters()
     
     compressor.updateMix(compMix);
     compressor.updateThres(thresdB);
-    compressor.updateAttack(sampleRate, compAttackMS);
-    compressor.updateRelease(sampleRate, compReleaseMS);
+    compressor.updateAttack(compAttackMS);
+    compressor.updateRelease(compReleaseMS);
 }
 
 void PunkOTTProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // juce::ignoreUnused(sampleRate);
+    juce::dsp::ProcessSpec spec;
+    spec.maximumBlockSize = samplesPerBlock;
+    spec.numChannels = getTotalNumOutputChannels();
+    spec.sampleRate = sampleRate;
     
-    gate.prepare(sampleRate, samplesPerBlock);
-    gate.updateAttack((float) sampleRate, 100.f);
-    gate.updateRelease((float) sampleRate, 30.f);
-    gate.updateMix(80.f);
+    gate.prepare(spec);
+    gate.updateAttack( 100.f );
+    gate.updateRelease( 30.f );
+    gate.updateMix( 80.f );
     
-    masterLimiter.prepare(sampleRate, samplesPerBlock);
-    masterLimiter.updateThres(-3.f);
-    masterLimiter.updateKnee(1.0f);
-    masterLimiter.updateRatio(20.0f);
-    masterLimiter.updateAttack((float) sampleRate, 30.0f);
-    masterLimiter.updateRelease((float) sampleRate, 100.0f);
+    masterLimiter.prepare(spec);
+    masterLimiter.updateThres( -3.f );
+    masterLimiter.updateKnee( 1.0f );
+    masterLimiter.updateRatio( 20.0f );
+    masterLimiter.updateAttack( 30.0f );
+    masterLimiter.updateRelease(  100.0f );
     
-    lifter.prepare(sampleRate, samplesPerBlock);
+    lifter.prepare(spec);
     lifter.updateRatio(6.f);
-    compressor.prepare(sampleRate, samplesPerBlock);
+    compressor.prepare(spec);
     compressor.updateRatio(8.f);
     
     clipper.setGainFactor(1.7f);
@@ -343,13 +347,13 @@ void PunkOTTProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     gate.process(buffer);
     
     // 2. OTT - Lifter
-    lifter.process(buffer, false);
+    lifter.process(buffer);
     
     // 2. OTT - Comp
-    compressor.process(buffer, false);
+    compressor.process(buffer);
     
     // 2. OTT - Safe limiter
-    masterLimiter.process(buffer, true);
+    masterLimiter.process(buffer);
     
     // 3. UTILITIES - Clipper
     if (clipperState) {
