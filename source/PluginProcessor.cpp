@@ -652,8 +652,10 @@ void PunkOTT_MB_Processor::processBlock (juce::AudioBuffer<float>& buffer,
     highPassFilter1.process(midContext);
     lowPassFilter2.process(midContext);
     
-    // Phase compensation for low band (optional but recommended)
-    allPassFilter.process(lowContext);
+    /* Phase compensation for low band (in theory)
+     * Midrange destroyer (in practice)
+     */
+    // allPassFilter.process(lowContext);
     
     // 3. OTT - MULTIBAND PROCESSING
     lowLifter.process(lowBand);
