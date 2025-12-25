@@ -524,39 +524,39 @@ void PluginEditor::resized()
     int colWidth = gridWidth / 3;
     int rowHeight = gridHeight / 2;
     
-    lowLifterContainer.setBounds(area.withX( 0 )    // col * colWidth
-                                     .withY( 0 )    // row * rowHeigh
+    lowLifterContainer.setBounds(area.withX( 50 )    // col * colWidth + sideBarL
+                                     .withY( 50 )    // row * rowHeigh + header
                                      .withWidth( colWidth )
                                      .withHeight( rowHeight )
                                      .reduced( 5 )
                                  );
-    midLifterContainer.setBounds(area.withX( colWidth )
-                                     .withY( 0 )
+    midLifterContainer.setBounds(area.withX( 50 + colWidth )
+                                     .withY( 50 )
                                      .withWidth( colWidth )
                                      .withHeight( rowHeight )
                                      .reduced( 5 )
                                  );
-    highLifterContainer.setBounds(area.withX( 2 * colWidth )
-                                      .withY( 0 )
+    highLifterContainer.setBounds(area.withX( 50 + 2 * colWidth )
+                                      .withY( 50 )
                                       .withWidth( colWidth )
                                       .withHeight( rowHeight )
                                       .reduced( 5 )
                                   );
     
-    lowCompContainer.setBounds(area.withX( 0 )
-                                   .withY( rowHeight )
+    lowCompContainer.setBounds(area.withX( 50 )
+                                   .withY( 50 + rowHeight )
                                    .withWidth( colWidth )
                                    .withHeight( rowHeight )
                                    .reduced( 5 )
                                );
-    midCompContainer.setBounds(area.withX( colWidth )
-                                   .withY( rowHeight )
+    midCompContainer.setBounds(area.withX( 50 + colWidth )
+                                   .withY( 50 + rowHeight )
                                    .withWidth( colWidth )
                                    .withHeight( rowHeight )
                                    .reduced( 5 )
                                );
-    highCompContainer.setBounds(area.withX( 2 * colWidth )
-                                    .withY( rowHeight )
+    highCompContainer.setBounds(area.withX( 50 + 2 * colWidth )
+                                    .withY( 50 + rowHeight )
                                     .withWidth( colWidth )
                                     .withHeight( rowHeight )
                                     .reduced( 5 )
@@ -564,12 +564,12 @@ void PluginEditor::resized()
     
     
     // Position sliders inside lifter container
-    auto lowLifterSliderArea = lowLifterContainer.getLocalBounds().reduced( 5 );
-    auto midLifterSliderArea = midLifterContainer.getLocalBounds().reduced( 5 );
-    auto highLifterSliderArea = highLifterContainer.getLocalBounds().reduced( 5 );
-    auto lowCompSliderArea = lowCompContainer.getLocalBounds().reduced( 5 );
-    auto midCompSliderArea = midCompContainer.getLocalBounds().reduced( 5 );
-    auto highCompSliderArea = highCompContainer.getLocalBounds().reduced( 5 );
+    auto lowLifterSliderArea = lowLifterContainer.getBounds().reduced( 5 );
+    auto midLifterSliderArea = midLifterContainer.getBounds().reduced( 5 );
+    auto highLifterSliderArea = highLifterContainer.getBounds().reduced( 5 );
+    auto lowCompSliderArea = lowCompContainer.getBounds().reduced( 5 );
+    auto midCompSliderArea = midCompContainer.getBounds().reduced( 5 );
+    auto highCompSliderArea = highCompContainer.getBounds().reduced( 5 );
     
     // Split into top and bottom rows
     auto topRow = lowLifterSliderArea.removeFromTop(lowLifterSliderArea.getHeight() / 2);
