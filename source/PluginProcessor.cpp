@@ -446,23 +446,19 @@ void PunkOTT_MB_Processor::updateParameters()
     // const float outdB = apvts.getRawParameterValue(Parameters::outId)->load();
     outGain = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::outId)->load() );
     
-    // --- 2.0. OTT - CROSSOVER FILTERS
-    lowLevel = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::lowLevelId)->load() );
-    midLevel = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::midLevelId)->load() );
-    highLevel = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::highLevelId)->load() );
-    
-    lowPassFilter1.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
-    lowPassFilter2.setCutoffFrequency( apvts.getRawParameterValue(Parameters::midhigh_CrossId)->load() );
-    highPassFilter1.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
-    highPassFilter2.setCutoffFrequency( apvts.getRawParameterValue(Parameters::midhigh_CrossId)->load() );
-    allPassFilter.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
-    
     // --- 2.1. OTT - LOW BAND
     // Lifter updates
-    lowLifter.updateMix( apvts.getRawParameterValue(Parameters::lowLifterMixId)->load() );
-    lowLifter.updateRange( apvts.getRawParameterValue(Parameters::lowLifterThresId)->load() );
+    float lowLiftMix = apvts.getRawParameterValue(Parameters::lowLifterMixId)->load();
+    float lowLiftRange = apvts.getRawParameterValue(Parameters::lowLifterThresId)->load();
+    lowLifter.updateMix( lowLiftMix );
+    lowLifter.updateRange( lowLiftRange );
     lowLifter.updateAttack( apvts.getRawParameterValue(Parameters::lowLifterAttackId)->load() );
     lowLifter.updateRelease( apvts.getRawParameterValue(Parameters::lowLifterReleaseId)->load() );
+    // Level
+    float lowLifterCompensationGain = (lowLiftRange > -40.0f) ? juce::jmap(lowLiftRange, -40.0f, 0.0f, 0.0f, -8.0f) : 0.0f;
+    lowLifterCompensationGain = juce::Decibels::decibelsToGain(lowLifterCompensationGain);
+    float newLowLevel = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::lowLevelId)->load() );
+    lowLevel = newLowLevel * ( lowLifterCompensationGain * lowLiftMix / 100.f + (1.f - lowLiftMix / 100.f) );
     // Compressor updates
     lowComp.updateMix( apvts.getRawParameterValue(Parameters::lowCompMixId)->load() );
     lowComp.updateThres( apvts.getRawParameterValue(Parameters::lowCompThresId)->load() );
@@ -471,10 +467,17 @@ void PunkOTT_MB_Processor::updateParameters()
     
     // --- 2.2. OTT - MID BAND
     // Lifter updates
-    midLifter.updateMix( apvts.getRawParameterValue(Parameters::midLifterMixId)->load() );
-    midLifter.updateRange( apvts.getRawParameterValue(Parameters::midLifterThresId)->load() );
+    float midLiftMix = apvts.getRawParameterValue(Parameters::midLifterMixId)->load();
+    float midLiftRange = apvts.getRawParameterValue(Parameters::midLifterThresId)->load();
+    midLifter.updateMix( midLiftMix );
+    midLifter.updateRange( midLiftRange );
     midLifter.updateAttack( apvts.getRawParameterValue(Parameters::midLifterAttackId)->load() );
     midLifter.updateRelease( apvts.getRawParameterValue(Parameters::midLifterReleaseId)->load() );
+    // Level
+    float midLifterCompensationGain = (midLiftRange > -40.0f) ? juce::jmap(midLiftRange, -40.0f, 0.0f, 0.0f, -8.0f) : 0.0f;
+    midLifterCompensationGain = juce::Decibels::decibelsToGain(midLifterCompensationGain);
+    float newMidLevel = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::midLevelId)->load() );
+    midLevel = newMidLevel * ( midLifterCompensationGain * midLiftMix / 100.f + (1.f - midLiftMix / 100.f) );
     // Compressor updates
     midComp.updateMix( apvts.getRawParameterValue(Parameters::midCompMixId)->load() );
     midComp.updateThres( apvts.getRawParameterValue(Parameters::midCompThresId)->load() );
@@ -483,15 +486,29 @@ void PunkOTT_MB_Processor::updateParameters()
     
     // --- 2.3. OTT - HIGH BAND
     // Lifter updates
-    highLifter.updateMix( apvts.getRawParameterValue(Parameters::highLifterMixId)->load() );
-    highLifter.updateRange( apvts.getRawParameterValue(Parameters::highLifterThresId)->load() );
+    float highLiftMix = apvts.getRawParameterValue(Parameters::highLifterMixId)->load();
+    float highLiftRange = apvts.getRawParameterValue(Parameters::highLifterThresId)->load();
+    highLifter.updateMix( highLiftMix );
+    highLifter.updateRange( highLiftRange );
     highLifter.updateAttack( apvts.getRawParameterValue(Parameters::highLifterAttackId)->load() );
     highLifter.updateRelease( apvts.getRawParameterValue(Parameters::highLifterReleaseId)->load() );
+    // Level
+    float highLifterCompensationGain = (highLiftRange > -40.0f) ? juce::jmap(highLiftRange, -40.0f, 0.0f, 0.0f, -8.0f) : 0.0f;
+    highLifterCompensationGain = juce::Decibels::decibelsToGain(highLifterCompensationGain);
+    float newHighLevel = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::highLevelId)->load() );
+    highLevel = newHighLevel * ( highLifterCompensationGain * highLiftMix / 100.f + (1.f - highLiftMix / 100.f) );
     // Compressor updates
     highComp.updateMix( apvts.getRawParameterValue(Parameters::highCompMixId)->load() );
     highComp.updateThres( apvts.getRawParameterValue(Parameters::highCompThresId)->load() );
     highComp.updateAttack( apvts.getRawParameterValue(Parameters::highCompAttackId)->load() );
     highComp.updateRelease( apvts.getRawParameterValue(Parameters::highCompReleaseId)->load() );
+    
+    // --- 2.4. OTT - CROSSOVER FILTERS
+    lowPassFilter1.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
+    lowPassFilter2.setCutoffFrequency( apvts.getRawParameterValue(Parameters::midhigh_CrossId)->load() );
+    highPassFilter1.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
+    highPassFilter2.setCutoffFrequency( apvts.getRawParameterValue(Parameters::midhigh_CrossId)->load() );
+    allPassFilter.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
 }
 
 void PunkOTT_MB_Processor::prepareToPlay (double sampleRate, int samplesPerBlock)
