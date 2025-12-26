@@ -522,7 +522,7 @@ void PunkOTT_MB_Processor::prepareToPlay (double sampleRate, int samplesPerBlock
     gate.prepare(spec);
     gate.updateAttack( 100.f );
     gate.updateRelease( 30.f );
-    gate.updateMix( 80.f );
+    gate.updateMix( 90.f );
     
     masterLimiter.prepare(spec);
     masterLimiter.updateThres( -3.f );
