@@ -564,7 +564,7 @@ void PunkOTT_MB_Processor::prepareToPlay (double sampleRate, int samplesPerBlock
     midBand.setSize(spec.numChannels, samplesPerBlock);
     highBand.setSize(spec.numChannels, samplesPerBlock);
     
-    clipper.setGainFactor(1.7f);
+    clipper.setOutGain(1.7f);
     
     updateParameters();
 }
