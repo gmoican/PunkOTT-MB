@@ -8,47 +8,43 @@ PluginEditor::PluginEditor (PunkOTT_MB_Processor& p)
     juce::LookAndFeel::setDefaultLookAndFeel(&myCustomLnF);
     
     // --- LAYOUT ---
-    header.setColour (juce::TextButton::buttonColourId, UIColors::container.darker(0.5f)
-                                                                           .withAlpha(0.25f)
-                      );
+    header.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     header.setEnabled(false);
     addAndMakeVisible (header);
     
-    footer.setColour (juce::TextButton::buttonColourId, UIColors::container.darker(0.5f)
-                                                                           .withAlpha(0.25f)
-                      );
+    footer.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     footer.setEnabled(false);
     addAndMakeVisible (footer);
     
-    sidebarLeft.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    sidebarLeft.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     sidebarLeft.setEnabled(false);
     addAndMakeVisible (sidebarLeft);
     
-    sidebarRight.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    sidebarRight.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     sidebarRight.setEnabled(false);
     addAndMakeVisible (sidebarRight);
     
-    lowLifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    lowLifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     lowLifterContainer.setEnabled(false);
     addAndMakeVisible (lowLifterContainer);
     
-    midLifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    midLifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     midLifterContainer.setEnabled(false);
     addAndMakeVisible (midLifterContainer);
     
-    highLifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    highLifterContainer.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     highLifterContainer.setEnabled(false);
     addAndMakeVisible (highLifterContainer);
     
-    lowCompContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    lowCompContainer.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     lowCompContainer.setEnabled(false);
     addAndMakeVisible (lowCompContainer);
     
-    midCompContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    midCompContainer.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     midCompContainer.setEnabled(false);
     addAndMakeVisible (midCompContainer);
     
-    highCompContainer.setColour (juce::TextButton::buttonColourId, UIColors::container.withAlpha(0.25f));
+    highCompContainer.setColour (juce::TextButton::buttonColourId, UIColors::background.brighter(0.4f).withAlpha(0.25f));
     highCompContainer.setEnabled(false);
     addAndMakeVisible (highCompContainer);
     

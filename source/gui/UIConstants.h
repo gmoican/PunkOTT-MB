@@ -4,13 +4,12 @@
 
 namespace UIColors
 {
-    // Define your 6-color palette
-    const juce::Colour background    = juce::Colour(0xff1B3C53);  // White background
-    const juce::Colour container     = juce::Colour(0xff234C6A);  // Light Orange
-    const juce::Colour primary       = juce::Colour(0xffDFD0B8);  // Strong Orange
-    const juce::Colour secondary     = juce::Colour(0xff456882);  // Mid Orange
-    const juce::Colour text          = juce::Colour(0xffE0D9D9);  // Strong Red
-    const juce::Colour highlight     = juce::Colour(0xffD3DAD9);  // Mid Red
+    // Define your 5-color palette
+    const juce::Colour background    = juce::Colour(0xff0A0908);
+    const juce::Colour primary       = juce::Colour(0xffEAE0D5);
+    const juce::Colour secondary     = juce::Colour(0xff22333B);
+    const juce::Colour text          = juce::Colour(0xffF7F7F7);
+    const juce::Colour highlight     = juce::Colour(0xffFCA311);
 }
 
 namespace UIDimensions
