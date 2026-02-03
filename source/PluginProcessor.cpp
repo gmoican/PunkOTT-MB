@@ -712,17 +712,20 @@ juce::AudioProcessorEditor* PunkOTT_MB_Processor::createEditor()
 //==============================================================================
 void PunkOTT_MB_Processor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused (destData);
+    // juce::ignoreUnused (destData);
+    const auto state = apvts.copyState();
+    const auto xml( state.createXml() );
+    copyXmlToBinary(*xml, destData);
 }
 
 void PunkOTT_MB_Processor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused (data, sizeInBytes);
+    // juce::ignoreUnused (data, sizeInBytes);
+    const auto xmlState = getXmlFromBinary(data, sizeInBytes);
+    if (xmlState == nullptr)
+        return;
+    const auto newTree = juce::ValueTree::fromXml(*xmlState);
+    apvts.replaceState(newTree);
 }
 
 //==============================================================================
