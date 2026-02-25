@@ -29,7 +29,7 @@ namespace Parameters
 
     constexpr auto outId = "out_gain";
     constexpr auto outName = "Output Gain (dB)";
-    constexpr auto outDefault = 0.f;
+    constexpr auto outDefault = -8.f;
     constexpr auto outMin = -24.0f;
     constexpr auto outMax = 24.0f;
 
