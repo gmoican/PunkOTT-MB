@@ -224,7 +224,6 @@ private:
         
     Filter lowPassFilter1, lowPassFilter2;      // For low band
     Filter highPassFilter1, highPassFilter2;    // For high band
-    Filter allPassFilter;                       // For phase compensation
     
     juce::AudioBuffer<float> lowBand, midBand, highBand;
     

@@ -508,7 +508,6 @@ void PunkOTT_MB_Processor::updateParameters()
     lowPassFilter2.setCutoffFrequency( apvts.getRawParameterValue(Parameters::midhigh_CrossId)->load() );
     highPassFilter1.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
     highPassFilter2.setCutoffFrequency( apvts.getRawParameterValue(Parameters::midhigh_CrossId)->load() );
-    allPassFilter.setCutoffFrequency( apvts.getRawParameterValue(Parameters::lowmid_CrossId)->load() );
 }
 
 void PunkOTT_MB_Processor::prepareToPlay (double sampleRate, int samplesPerBlock)
@@ -550,19 +549,16 @@ void PunkOTT_MB_Processor::prepareToPlay (double sampleRate, int samplesPerBlock
     lowPassFilter2.prepare(spec);
     highPassFilter1.prepare(spec);
     highPassFilter2.prepare(spec);
-    allPassFilter.prepare(spec);
+    lowPassFilter1.reset();
+    lowPassFilter2.reset();
+    highPassFilter1.reset();
+    highPassFilter2.reset();
     
     // Set filter types and frequencies
     lowPassFilter1.setType(juce::dsp::LinkwitzRileyFilterType::lowpass);
     lowPassFilter2.setType(juce::dsp::LinkwitzRileyFilterType::lowpass);
     highPassFilter1.setType(juce::dsp::LinkwitzRileyFilterType::highpass);
     highPassFilter2.setType(juce::dsp::LinkwitzRileyFilterType::highpass);
-    allPassFilter.setType(juce::dsp::LinkwitzRileyFilterType::allpass);
-    
-    // Allocate band buffers
-    lowBand.setSize(spec.numChannels, samplesPerBlock);
-    midBand.setSize(spec.numChannels, samplesPerBlock);
-    highBand.setSize(spec.numChannels, samplesPerBlock);
     
     clipper.setOutGain(1.7f);
     
@@ -573,6 +569,9 @@ void PunkOTT_MB_Processor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+    lowBand.clear();
+    midBand.clear();
+    highBand.clear();
 }
 
 bool PunkOTT_MB_Processor::isBusesLayoutSupported (const BusesLayout& layouts) const
@@ -611,6 +610,11 @@ void PunkOTT_MB_Processor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, numSamples);
     
+    // Allocate band buffers
+    lowBand.setSize(numChannels, numSamples);
+    midBand.setSize(numChannels, numSamples);
+    highBand.setSize(numChannels, numSamples);
+    
     // Update params
     updateParameters();
     
@@ -642,20 +646,15 @@ void PunkOTT_MB_Processor::processBlock (juce::AudioBuffer<float>& buffer,
     juce::dsp::ProcessContextReplacing<float> midContext(midBlock);
     juce::dsp::ProcessContextReplacing<float> highContext(highBlock);
     
-    // Process LOW band: LP @ lowMidCrossover
+    // Process LOW band: LP at lowMidCrossover
     lowPassFilter1.process(lowContext);
     
-    // Process HIGH band: HP @ midHighCrossover
+    // Process HIGH band: HP at midHighCrossover
     highPassFilter2.process(highContext);
     
-    // Process MID band: HP @ lowMidCrossover, then LP @ midHighCrossover
+    // Process MID band: HP @ lowMidCrossover, then LP at midHighCrossover
     highPassFilter1.process(midContext);
     lowPassFilter2.process(midContext);
-    
-    /* Phase compensation for low band (in theory)
-     * Midrange destroyer (in practice)
-     */
-    // allPassFilter.process(lowContext);
     
     // 3. OTT - MULTIBAND PROCESSING
     lowLifter.process(lowBand);
