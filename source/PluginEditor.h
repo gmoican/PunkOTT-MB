@@ -28,7 +28,7 @@ private:
     juce::TextButton header, sidebarLeft, sidebarRight, lowLifterContainer, midLifterContainer, highLifterContainer, lowCompContainer, midCompContainer, highCompContainer, crossoverContainer, footer;
     
     // Sliders - Rotary knobs
-    juce::Slider inputSlider, gateSlider, outputSlider;
+    juce::Slider inputSlider, gateSlider, mixSlider, outputSlider;
     
     juce::Slider lowLifterRangeSlider, lowLifterAttackSlider, lowLifterReleaseSlider, lowLifterMixSlider;
     juce::Slider midLifterRangeSlider, midLifterAttackSlider, midLifterReleaseSlider, midLifterMixSlider;
@@ -52,7 +52,7 @@ private:
     juce::Label versionTag;
     
     // Attachments for linking sliders-parameters
-    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> inputAttachment, gateAttachment, outputAttachment;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> inputAttachment, gateAttachment, mixAttachment, outputAttachment;
     
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> lowLifterRangeAttachment, lowLifterAttackAttachment, lowLifterReleaseAttachment, lowLifterMixAttachment;
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> midLifterRangeAttachment, midLifterAttackAttachment, midLifterReleaseAttachment, midLifterMixAttachment;

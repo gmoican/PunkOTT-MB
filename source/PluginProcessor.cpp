@@ -120,6 +120,15 @@ juce::AudioProcessorValueTreeState::ParameterLayout PunkOTT_MB_Processor::create
                                                                     )
                          );
     
+    // Master Mixer
+    utilsGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
+                                                                     Parameters::mixId,
+                                                                     Parameters::mixName,
+                                                                     juce::NormalisableRange<float>(Parameters::mixMin, Parameters::mixMax, 1.0f),
+                                                                     Parameters::mixDefault
+                                                                     )
+                         );
+    
     // Output Level
     utilsGroup->addChild(std::make_unique<juce::AudioParameterFloat>(
                                                                      Parameters::outId,
@@ -435,15 +444,14 @@ juce::AudioProcessorValueTreeState::ParameterLayout PunkOTT_MB_Processor::create
 void PunkOTT_MB_Processor::updateParameters()
 {
     // --- 1. Utilities
-    // const float inLeveldB = apvts.getRawParameterValue(Parameters::inId)->load();
     inGain = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::inId)->load() );
     
-    // const float gatedB = apvts.getRawParameterValue(Parameters::gateId)->load();
     gate.updateThres( apvts.getRawParameterValue(Parameters::gateId)->load() );
     
     clipperState = (bool) apvts.getRawParameterValue(Parameters::clipperId)->load();
     
-    // const float outdB = apvts.getRawParameterValue(Parameters::outId)->load();
+    masterMixer.setWetMixProportion( apvts.getRawParameterValue(Parameters::mixId)->load() / 100.f );
+    
     outGain = juce::Decibels::decibelsToGain( apvts.getRawParameterValue(Parameters::outId)->load() );
     
     // --- 2.1. OTT - LOW BAND
@@ -562,6 +570,8 @@ void PunkOTT_MB_Processor::prepareToPlay (double sampleRate, int samplesPerBlock
     
     clipper.setOutGain(1.7f);
     
+    masterMixer.prepare(spec);
+    
     updateParameters();
 }
 
@@ -625,6 +635,9 @@ void PunkOTT_MB_Processor::processBlock (juce::AudioBuffer<float>& buffer,
         levelMeters.rmsInputRight.store(juce::Decibels::gainToDecibels(buffer.getRMSLevel(1, 0, numSamples)));
     
     // 1. UTILITIES - INPUT GAIN & GATE
+    juce::dsp::AudioBlock<float> audioBlock = juce::dsp::AudioBlock<float>(buffer);
+    masterMixer.pushDrySamples(audioBlock);
+    
     buffer.applyGain(inGain);
     gate.process(buffer);
     
@@ -688,6 +701,8 @@ void PunkOTT_MB_Processor::processBlock (juce::AudioBuffer<float>& buffer,
     
     // 7. UTILITIES - OUTPUT GAIN
     buffer.applyGain(outGain);
+    
+    masterMixer.mixWetSamples(audioBlock);
     
     // GUI - Output level meters
     if (totalNumOutputChannels > 0)

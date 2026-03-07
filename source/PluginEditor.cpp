@@ -69,6 +69,16 @@ PluginEditor::PluginEditor (PunkOTT_MB_Processor& p)
     
     gateAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::gateId, gateSlider);
     
+    // Master Mix knob
+    mixSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    mixSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    mixSlider.setRange(Parameters::mixMin, Parameters::mixMax, 1.0);
+    mixSlider.setValue(Parameters::mixDefault);
+    mixSlider.setName("Mix");
+    addAndMakeVisible(mixSlider);
+    
+    mixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(processorRef.apvts, Parameters::mixId, mixSlider);
+    
     // Output knob
     outputSlider.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     outputSlider.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
@@ -397,7 +407,7 @@ PluginEditor::PluginEditor (PunkOTT_MB_Processor& p)
     // editor's size to whatever you need it to be.
     setResizable(true, true);
     getConstrainer()->setFixedAspectRatio(1.55);
-    setResizeLimits(650, 420, 780, 600);
+    setResizeLimits(650, 420, 1300, 840);
     setSize (650, 420);
 }
 
@@ -498,6 +508,8 @@ void PluginEditor::resized()
     gateSlider.setBounds(headerArea.removeFromLeft(headerArea.getHeight()));
     
     outputSlider.setBounds(headerArea.removeFromRight(headerArea.getHeight()));
+    
+    mixSlider.setBounds(headerArea.removeFromRight(headerArea.getHeight()));
     
     clipperButton.setBounds(headerArea.removeFromRight(headerArea.getHeight() + 20)
                                       .reduced(10, 15)

@@ -27,9 +27,15 @@ namespace Parameters
     constexpr auto clipperName = "Clipper";
     constexpr auto clipperDefault = true;
 
+    constexpr auto mixId = "mix";
+    constexpr auto mixName = "Master Mix (%)";
+    constexpr auto mixDefault = 100.f;
+    constexpr auto mixMin = 0.0f;
+    constexpr auto mixMax = 100.0f;
+
     constexpr auto outId = "out_gain";
     constexpr auto outName = "Output Gain (dB)";
-    constexpr auto outDefault = -8.f;
+    constexpr auto outDefault = -6.f;
     constexpr auto outMin = -24.0f;
     constexpr auto outMax = 24.0f;
 
@@ -209,6 +215,7 @@ private:
     punk_dsp::Gate gate;
     punk_dsp::Waveshaper clipper;
     bool clipperState = true;
+    juce::dsp::DryWetMixer<float> masterMixer;
     
     // --- OTT PROCESSORS ---
     punk_dsp::Lifter lowLifter, midLifter, highLifter;
